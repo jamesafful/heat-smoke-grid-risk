@@ -1,0 +1,10 @@
+pandas>=2.2
+numpy>=1.26
+pyarrow>=17.0
+fastparquet>=2024.5.0
+geopandas>=1.0; platform_system!='Windows'  # for real HMS shapefiles (not used in sample run)
+shapely>=2.0
+statsmodels>=0.14
+scikit-learn>=1.4
+matplotlib>=3.8
+pytest>=8.0

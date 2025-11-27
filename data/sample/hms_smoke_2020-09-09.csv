@@ -1,0 +1,4 @@
+date,density,poly_id,area_sqkm,centroid_lon,centroid_lat
+2020-09-09,Light,1,12500,-96.4,39.7
+2020-09-09,Moderate,2,4300,-104.2,40.1
+2020-09-09,Heavy,3,820,-122.5,38.9
