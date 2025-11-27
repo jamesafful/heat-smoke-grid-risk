@@ -8,3 +8,6 @@ statsmodels>=0.14
 scikit-learn>=1.4
 matplotlib>=3.8
 pytest>=8.0
+pyogrio>=0.9
+pyproj>=3.6
+duckdb>=1.0

@@ -4,3 +4,9 @@ outputs/
 *.parquet
 *.png
 .DS_Store
+*.zip
+*.csv
+*.shp
+*.dbf
+*.cpg
+*.shx
