@@ -27,44 +27,50 @@ def main():
     smk = pd.read_parquet(args.smoke)
     smk["date"] = pd.to_datetime(smk["date"])
     smk["fips"] = smk["fips"].astype(str).str.zfill(5)
-
     # --- Outages (optional) ---
     out_daily = pd.DataFrame({
-        "fips": [fips]*len(idx),
+        "fips": [fips] * len(idx),
         "date": idx["date"],
         "cust_out_peak": 0,
         "cust_out_sum": 0,
-        "total_customers": pd.NA
+        "total_customers": pd.NA,
     })
 
-    # NOTE: argparse uses underscores for attribute names
     if args.eaglei_csv and os.path.exists(args.eaglei_csv):
         con = duckdb.connect()
+        # NOTE: Do NOT use "TIMESTAMP ?" with a placeholder in DuckDB. Just use ">= ?" and pass a Timestamp.
         q = """
-        SELECT fips_code, run_start_time, customers_out, total_customers
-        FROM read_csv_auto(?, header=True)
-        WHERE fips_code = ?
-          AND run_start_time >= TIMESTAMP ?
-          AND run_start_time <  TIMESTAMP ?
+            SELECT
+                fips_code,
+                run_start_time,
+                customers_out,
+                total_customers
+            FROM read_csv_auto(?, header = TRUE)
+            WHERE fips_code = ?
+            AND run_start_time >= ?
+            AND run_start_time <  ?
         """
-        df = con.execute(
-            q,
-            [args.eaglei_csv, int(fips), str(start.date()), str((end + pd.Timedelta(days=1)).date())]
-        ).df()
+        start_ts = pd.Timestamp(start)                     # inclusive start, normalized at midnight
+        end_excl = pd.Timestamp(end) + pd.Timedelta(days=1)  # exclusive end boundary
+        df = con.execute(q, [args.eaglei_csv, int(fips), start_ts, end_excl]).df()
 
         if not df.empty:
             df["date"] = pd.to_datetime(df["run_start_time"]).dt.floor("D")
-            grp = (df.groupby("date", as_index=False)
-                     .agg(cust_out_peak=("customers_out","max"),
-                          cust_out_sum=("customers_out","sum"),
-                          total_customers=("total_customers","max")))
+            grp = (
+                df.groupby("date", as_index=False)
+                .agg(cust_out_peak=("customers_out", "max"),
+                    cust_out_sum=("customers_out", "sum"),
+                    total_customers=("total_customers", "max"))
+            )
             grp["fips"] = fips
             out_daily = idx.merge(grp, on="date", how="left")
             out_daily["fips"] = fips
             out_daily["cust_out_peak"] = out_daily["cust_out_peak"].fillna(0).astype(int)
             out_daily["cust_out_sum"]  = out_daily["cust_out_sum"].fillna(0).astype(int)
             if out_daily["total_customers"].notna().any():
-                out_daily["total_customers"] = out_daily["total_customers"].fillna(out_daily["total_customers"].max()).astype(int)
+                out_daily["total_customers"] = (
+                    out_daily["total_customers"].fillna(out_daily["total_customers"].max()).astype(int)
+                )
             else:
                 out_daily["total_customers"] = 0
 
