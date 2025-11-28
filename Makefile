@@ -29,6 +29,7 @@ OUT_DIR      := outputs
 
 COUNTIES_SHP := $(COUNTIES_DIR)/cb_2020_us_county_500k.shp
 
+# ===== Pipeline =====
 pilot: dirs epa_download counties_download hms_download ingest_pm25 smoke_intersect build_panel
 	@echo "✔ Pilot panel: $(OUT_DIR)/panel_$(COUNTY)_$(START_DATE)_$(END_DATE).parquet"
 
@@ -45,30 +46,9 @@ counties_download: | dirs
 	curl -fL -o "$(COUNTIES_DIR)/cb_2020_us_county_500k.zip" "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_500k.zip"
 	unzip -o "$(COUNTIES_DIR)/cb_2020_us_county_500k.zip" -d "$(COUNTIES_DIR)"
 
-# HMS daily shapefiles (date loop done in Python). Use <<- so leading TABs are stripped.
+# HMS daily shapefiles for the requested window (handled by a tiny Python helper)
 hms_download: | dirs
-	@$(PY) - <<-'PY'
-		import os, pathlib, sys, datetime, subprocess
-		hms_root = "data/raw/hms"
-		start = os.environ.get("START_DATE")
-		end   = os.environ.get("END_DATE")
-		if not (start and end):
-		    sys.exit("START_DATE and END_DATE are required")
-		d0 = datetime.datetime.fromisoformat(start)
-		d1 = datetime.datetime.fromisoformat(end)
-		cur = d0
-		while cur <= d1:
-		    y = cur.strftime("%Y"); m = cur.strftime("%m"); d = cur.strftime("%d")
-		    url = f"https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/{y}/{m}/hms_smoke{y}{m}{d}.zip"
-		    dest_dir = pathlib.Path(hms_root)/y/m
-		    dest_dir.mkdir(parents=True, exist_ok=True)
-		    zip_path = dest_dir/f"hms_smoke{y}{m}{d}.zip"
-		    print("Downloading", url)
-		    subprocess.run(["curl","-fL","-o",str(zip_path),url], check=False)
-		    if zip_path.exists() and zip_path.stat().st_size > 0:
-		        subprocess.run(["unzip","-o",str(zip_path),"-d",str(dest_dir)], check=False)
-		    cur += datetime.timedelta(days=1)
-	PY
+	$(PY) scripts/fetch_hms.py --start $(START_DATE) --end $(END_DATE) --hms-dir $(HMS_DIR)
 
 # Build PM2.5 county-day mean for the window
 ingest_pm25:
