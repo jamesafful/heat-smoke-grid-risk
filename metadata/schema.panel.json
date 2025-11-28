@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "County-day panel schema",
+  "type": "object",
+  "properties": {
+    "fips":            { "type": "string",  "pattern": "^[0-9]{5}$", "description": "County FIPS (zero-padded 5)" },
+    "date":            { "type": "string",  "format": "date",        "description": "Local date (YYYY-MM-DD)" },
+    "pm25_mean":       { "type": "number",  "description": "Daily mean PM2.5 (µg/m³), EPA daily_88101" },
+    "share_light":     { "type": "number",  "minimum": 0, "maximum": 1, "description": "County area share covered by HMS 'Light' smoke" },
+    "share_moderate":  { "type": "number",  "minimum": 0, "maximum": 1, "description": "County area share covered by HMS 'Moderate' smoke" },
+    "share_heavy":     { "type": "number",  "minimum": 0, "maximum": 1, "description": "County area share covered by HMS 'Heavy' smoke" },
+    "cust_out_peak":   { "type": "integer", "minimum": 0, "description": "Daily peak customers out (from EAGLE-I)"},
+    "cust_out_sum":    { "type": "integer", "minimum": 0, "description": "Sum of customers out over intervals"},
+    "total_customers": { "type": "integer", "minimum": 0, "description": "Max total customers (denominator)"},
+    "event_any":       { "type": "integer", "enum": [0,1], "description": "Indicator: any outage (>0 customers out) that day"}
+  },
+  "required": ["fips","date","pm25_mean","share_light","share_moderate","share_heavy","cust_out_peak","cust_out_sum","total_customers","event_any"],
+  "additionalProperties": false
+}
