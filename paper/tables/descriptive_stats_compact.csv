@@ -1,0 +1,9 @@
+,min,max,nunique
+pm25_mean,2.286806,141.452083,21
+share_light,0.000000,1.000000,13
+share_moderate,0.000000,0.000000,1
+share_heavy,0.000000,0.500000,9
+cust_out_peak,0.000000,1200.000000,4
+cust_out_sum,0.000000,1200.000000,4
+total_customers,0.000000,2300000.000000,2
+event_any,0.000000,1.000000,2
