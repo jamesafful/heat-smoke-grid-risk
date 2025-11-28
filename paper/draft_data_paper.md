@@ -202,6 +202,14 @@ We include a pilot PM₂.₅ distribution figure (`paper/figures/panel_distribut
 
 ---
 
+## Known limitations
+
+- HMS smoke polygons are analyst-derived from visible imagery; presence of smoke does not imply ground-level PM₂.₅.
+- EAGLE-I coverage varies by area and time; we aggregate to county-day and expose `event_any` and customer counts where available.
+- Pilot panel covers a single week and three counties to demonstrate the pipeline and schema; it is not meant for inference.
+
+
+---
 ## Acknowledgements
 
 We acknowledge the following U.S. public agencies for making their data openly available:
