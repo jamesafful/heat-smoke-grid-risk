@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: "Heat–Smoke–Grid Risk: County-Day Panel (pilot dataset)"
+message: "If you use this dataset or code, please cite this repository."
+authors:
+  - family-names: "Afful"
+    given-names: "James"
+version: "v1.2"
+date-released: "2025-11-28"
+keywords: [power outages, wildfire smoke, PM2.5, HMS, county-day, EAGLE-I]
+license: "MIT"
+repository-code: "https://github.com/jamesafful/heat-smoke-grid-risk"
