@@ -10,3 +10,4 @@ outputs/
 *.dbf
 *.cpg
 *.shx
+*.yml
